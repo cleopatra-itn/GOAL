@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/lightslider.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+  <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/lightslider.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <title>Wiki-MLM Demonstrator</title>
+</head>
+
+<body>
+  <!-- title -->
+  <div class="container-fluid">
+      <h2 class="main-title">MLM: Multiple Languages and Modalities</h2>
+  </div>
+  <!-- title -->
+
+  <!-- main content -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-5">
+        {% include "input.html" %}
+      </div>
+      <div class="col-sm-7">
+        {% include "map.html" %}
+      </div>
+    </div>
+  </div>
+  <!-- main content -->
+
+  <!-- results -->
+  <div class="container-fluid">{% include "results.html" %}</div>
+  <!-- results -->
+
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container-fluid"><span>&copy; Copyright 2020: MLM - Version {{version}}</span></div>
+  </footer>
+  <!-- Footer -->
+</body>
+</html>
