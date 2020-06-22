@@ -35,11 +35,11 @@ $(document).ready( function() {
     // submit text
     $('#submit_text').click(function(e) {
         e.preventDefault();
-        var textQuery = $('#query').val();
+        var text = $('#query').val();
         $.ajax({
             type : "POST",
             url : "/",
-            data: {text_query: textQuery},
+            data: {text_query: text},
             success: function(answer) {
                 $('#answer').html(answer);
             }
@@ -48,11 +48,11 @@ $(document).ready( function() {
     // submit image
     $('#submit_image').click(function(e) {
         e.preventDefault();
-        var imageQuery = $('#query').val();
+        var image_path = $('#vertical').find('.active').find('img').attr('src');
         $.ajax({
             type : "POST",
             url : "/",
-            data: {image_query: imageQuery},
+            data: {image_query: image_path},
             success: function(answer) {
                 $('#answer').html(answer);
             }
