@@ -24,7 +24,7 @@ def post_requests():
         # TODO
         # image_query = request.form['image_query']
         # call model for results
-        return 'Image Results'
+        return { 'coords': [3, 4], 'results': 'Image Results'}
     elif 'upload_query' in request.form:
         # TODO
         # upload image

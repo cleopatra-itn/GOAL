@@ -54,7 +54,7 @@ $(document).ready( function() {
             url : "/",
             data: {image_query: image_path},
             success: function(answer) {
-                $('#answer').html(answer);
+                $('#answer').html(answer['results']);
             }
         });
     });
