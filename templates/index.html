@@ -8,17 +8,17 @@
   <meta name="author" content="">
 
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/lightslider.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-  <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
 
+  <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js"></script>
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/lightslider.js') }}"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="https://use.fontawesome.com/0c88c5590c.js"></script>
 
-  <title>Wiki-MLM Demonstrator</title>
+  <title>MLM Demonstrator</title>
 </head>
 
 <body>
@@ -31,24 +31,28 @@
   <!-- main content -->
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-5">
-        {% include "input.html" %}
+      <div class="col-sm-1">
+        {% include "menu.html" %}
+        {% include "image-modal.html" %}
+        {% include "upload-modal.html" %}
+        {% include "info-modal.html" %}
       </div>
       <div class="col-sm-7">
         {% include "map.html" %}
       </div>
+      <div class="col-sm-4">
+        {% include "results.html" %}
+      </div>
     </div>
   </div>
-  <!-- main content -->
-
-  <!-- results -->
-  <div class="container-fluid">{% include "results.html" %}</div>
-  <!-- results -->
 
 
   <!-- Footer -->
   <footer class="footer">
-    <div class="container-fluid"><span>&copy; Copyright 2020: MLM - Version {{version}}</span></div>
+    <div class="container-fluid">
+      <span>&copy; Copyright 2020: MLM Demo - v{{version}}</span><br/>
+      <span style="font-size: 0.7rem;">Based on <a href="https://getbootstrap.com/" target="_blanck">Bootstrap</a>. Theme from <a href="https://bootswatch.com/" target="_blanck">Bootswatch</a>. Icons from <a href="https://fontawesome.com/" target="_blanck">Font Awesome</a>. Web fonts from <a href="https://fonts.google.com/" target="_blanck">Google</a>.</span>
+    </div>
   </footer>
   <!-- Footer -->
 </body>

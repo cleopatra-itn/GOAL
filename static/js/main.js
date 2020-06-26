@@ -1,89 +1,144 @@
-function openTab(evt, tabName) {
-    // Declare all variables
-    var i, tabcontent, tablinks;
+function showResults(results, map, markers) {
+    // get results for each task
+    const resultsIR = results['results_ir']
+    const resultsLE = results['results_le']
 
-    // Get all elements with class="tabcontent" and hide them
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
-    }
+    // show coordinates
+    markers.clearLayers();
+    resultsLE.forEach((result) => {
+        Object.keys(result).forEach((key) => {
+            // create the marker
+            var marker = L.marker(result[key]);
 
-    // Get all elements with class="tablinks" and remove the class "active"
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
+            // label
+            marker.bindPopup(key).openPopup();
 
-    // Show the current tab, and add an "active" class to the button that opened the tab
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
-  }
+            // add marker
+            markers.addLayer(marker);
+        })
+    })
+    map.addLayer(markers);
 
-$(document).ready( function() {
-    // lighttslider carusel
-    $('#vertical').lightSlider({
-        gallery:true,
-        item:1,
-        vertical:true,
-        verticalHeight:295,
-        vThumbWidth:50,
-        thumbItem:8,
-        thumbMargin:4,
-        slideMargin:0
-    });
+    // show results
+    $('#results').empty();
+    resultsIR.forEach((result, idx) => {
+        // Check if is gold
+        const borderClass = 'border-secondary' // ((result['is_gold']) ? 'border-success' : 'border-secondary');
+        // Construct card content
+        const cardContent = `
+            <div class="card ${borderClass}" id="card-${idx}">
+                <div class="card-body">
+                    <h4 class="card-title">${result['label']}</h4>
+                    <h6 class="card-subtitle mb-2 text-muted"><a href="https://www.wikidata.org/wiki/${result['id']}" target="_blank">${result['id']}</a></h6>
+                    <p class="card-text cut-text">${result['summary']}</p>
+                    <a href="" class="card-link" data-toggle="modal" data-target="#cardExpandModal-${idx}">Expand Card</a>
+                    <a href="" class="card-link" data-toggle="modal" data-target="#cardNewsModal-${idx}">News Articles</a>
+                </div>
+            </div>
+        `;
 
-    // submit text
-    $('#submit_text').click(function(e) {
-        e.preventDefault();
-        var text = $('#query').val();
-        $.ajax({
-            type : "POST",
-            url : "/",
-            data: {text_query: text},
-            success: function(answer) {
-                $('#answer').html(answer);
-            }
+        // Construct card expand modal
+        const cardExapndModal = `
+            <div class="modal fade" id="cardExpandModal-${idx}" tabindex="-1" role="dialog" aria-labelledby="cardExpandModalLabel-${idx}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="flex-column">
+                                <h5 class="modal-title" id="cardExpandModalLabel-${idx}">${result['label']}</h5>
+                                <h6><a href="https://www.wikidata.org/wiki/${result['id']}" target="_blank">${result['id']}</a></h6>
+                            </div>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="card-text">${result['summary']}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Construct card new-articles modal
+        const cardNewsModal = `
+            <div class="modal fade" id="cardNewsModal-${idx}" tabindex="-1" role="dialog" aria-labelledby="cardNewsModalLabel-${idx}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="flex-column">
+                                <h5 class="modal-title" id="cardExpandModalLabel-${idx}">${result['label']}</h5>
+                                <h6><a href="https://www.wikidata.org/wiki/${result['id']}" target="_blank">${result['id']}</a></h6>
+                            </div>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>TODO</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Append newyly created card elements to the container
+        $('#results').append(cardContent);
+        $('#results').append(cardExapndModal);
+        $('#results').append(cardNewsModal);
+    })
+}
+
+$(document).ready(function() {
+    var map = L.map('mapid').setView([51.1657, 10.4515], 2);
+    var markers = L.markerClusterGroup();
+    // page load
+    $(window).on('load',function(){
+        // show info modal
+        $('#infoModal').modal('show');
+
+        // create map
+        // map and markers as global variables
+        const layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
         });
+        map.addLayer(layer);
+        // L.marker([40.712, -74.006]).addTo(map) // .bindPopup("<strong></strong>").openPopup();
     });
+
+    $('#imageSamples img').click(function(){
+        $('.selected').removeClass('selected');
+        $(this).addClass('selected');
+    });
+
     // submit image
     $('#submit_image').click(function(e) {
         e.preventDefault();
-        var image_path = $('#vertical').find('.active').find('img').attr('src');
+        $('#imageModal').modal('hide');
+        var image_path = $('#imageSamples').find('.selected').attr('src');
+        $('#imageSamples').find('.selected').removeClass('selected');
+        var langImage = $('#imageLang').children("option:selected").val();
         $.ajax({
             type : "POST",
             url : "/",
-            data: {image_query: image_path},
-            success: function(answer) {
-                $('#answer').html(answer['results']);
-            }
-        });
-    });
-    // submit upload
-    $('#submit_upload').click(function(e) {
-        e.preventDefault();
-        var uploadQuery = $('#query').val();
-        $.ajax({
-            type : "POST",
-            url : "/",
-            data: {upload_query: uploadQuery},
-            success: function(answer) {
-                $('#answer').html(answer);
+            data: {query: image_path, lang: langImage},
+            success: function(results) {
+                if (!jQuery.isEmptyObject(results)) { showResults(results, map, markers) }
             }
         });
     });
 
-    // show text on click
-    $('.list-group').click(function(e) {
+    // submit uploaded image
+    $('#submit_upload').click(function(e) {
         e.preventDefault();
-        $('.list-group a').removeClass('active');
-        $(event.target).addClass('active');
-        var label = $(event.target).text();
+        $('#uploadModal').modal('hide');
+        // var uploadQuery = $('#query').val();
+        var langUpload = $('#uploadLang').children("option:selected").val();
         $.ajax({
             type : "POST",
             url : "/",
-            data: {get_summary: label},
-            success: function(query) {
-                $('.form-control').val(query);
+            data: {query: '', lang: langUpload},
+            success: function(results) {
+                if (!jQuery.isEmptyObject(results)) { showResults(results, map, markers) }
             }
         });
     });

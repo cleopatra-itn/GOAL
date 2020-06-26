@@ -1,0 +1,28 @@
+<div class="modal fade bd-example-modal-lg" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="imageModalLabel">Select Image</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Image content -->
+          <div id="imageSamples" class="tabcontent" style="display: block">
+              {% for data in sample_data %}
+                <img class="image-select" src="{{data['image']}}" />
+              {% endfor %}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <select class="custom-select" id="imageLang" style="width: auto;">
+            <option value="en" selected>EN</option>
+            <option value="de">DE</option>
+            <option value="fr">FR</option>
+          </select>
+          <input id="submit_image" class="btn btn-primary" type="submit" value="Retrieve Results">
+        </div>
+      </div>
+    </div>
+</div>

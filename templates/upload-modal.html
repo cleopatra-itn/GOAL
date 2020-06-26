@@ -1,0 +1,30 @@
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="uploadModalLabel">Upload Image</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Upload content -->
+          <div id="upload" class="tabcontent">
+            <div class="form-group">
+              <input type="file" class="form-control-file" id="inputImage" aria-describedby="fileHelp">
+              <small id="fileHelp" class="form-text text-muted">Allowed image extensions: png, jpg, jpeg</small>
+            </div>
+            <div id="uploadedImage"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <select class="custom-select" id="imageLang" style="width: auto;">
+            <option value="en" selected>EN</option>
+            <option value="de">DE</option>
+            <option value="fr">FR</option>
+          </select>
+          <input id="submit_upload" class="btn btn-primary" type="submit" value="Retrieve Results">
+        </div>
+      </div>
+    </div>
+</div>
