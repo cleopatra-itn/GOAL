@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from eventregistry import *
-er = EventRegistry(apiKey = 'c45d48f9-ea49-4c79-b89c-7bc84b80faf5')
+er = EventRegistry(apiKey = '')
 
 def load_news_data(keywords,lang):
 
@@ -8,7 +8,9 @@ def load_news_data(keywords,lang):
 
     keywords = keywords,
     keywordsLoc = "body",
+
     locationUri = er.getLocationUri(keywords),
+
     lang = lang,
     dataType = "news")
 
