@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 def load_sample_data():
     return [
         {

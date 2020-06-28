@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 def get_results(image_path, lang):
     sample = {
         'results_ir': [
