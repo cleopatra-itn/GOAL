@@ -5,3 +5,8 @@ docker-compose.yml
 logs.txt
 .DS_Store
 .vscode/
+*.pyc
+mlm-package-list.txt
+data/*
+models/checkpoints/*
+ER_API_KEY

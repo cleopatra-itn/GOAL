@@ -2,7 +2,7 @@
 
 During development run flask application in development mode for updating changes while running.
 
-``` bash 
+``` bash
 FLASK_APP=app.py FLASK_ENV=development flask run
 ```
 
