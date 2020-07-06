@@ -3,29 +3,23 @@ import h5py
 import json
 import torch
 import pickle
-import random
 import numpy as np
 from PIL import Image
 from pathlib import Path
 from models.args import get_parser
 from resizeimage import resizeimage
-from models.mlm_data import MLMData
 from models.mlm_model import MLMBaseline
 from models.log_manager import LogManager
-from models.geo_embeddings import GeoEmbeddings
 from models.scene_embeddings import SceneEmbeddings
+
+import warnings
+with warnings.catch_warnings():
+    warnings.filterwarnings('ignore')
+    from models.geo_embeddings import GeoEmbeddings
 
 # read parser
 parser = get_parser()
 args = parser.parse_args()
-
-# set a seed value
-random.seed(args.seed)
-np.random.seed(args.seed)
-torch.manual_seed(args.seed)
-if torch.cuda.is_available():
-    torch.cuda.manual_seed(args.seed)
-    torch.cuda.manual_seed_all(args.seed)
 
 # root path
 ROOT_PATH = Path(os.path.dirname(__file__)).parent
@@ -65,6 +59,7 @@ class MLMInference():
             checkpoint = torch.load(f'{model_path}/epoch_100.pth.tar', encoding='latin1')
 
         self._mlm_model.load_state_dict(checkpoint['state_dict'])
+        self._mlm_model.eval()
 
     def _load_image_embedding_models(self, model_path):
         self._geo_embedding = GeoEmbeddings(model_path=model_path)
@@ -72,32 +67,8 @@ class MLMInference():
 
     def _load_kmeans_model(self, data_path):
         self._kmeans = pickle.load(open(f'{data_path}/kmeans/checkpoint.pkl', 'rb'))
+        self._kmeans.verbose = False
         self._cluster_ids = json.load(open(f'{data_path}/kmeans/cluster_ids.json'))
-
-    def _read_image(self, image_path, size=[256, 256]):
-        LogManager.LogInfo(f'=> Resize image {image_path}')
-        img = Image.open(image_path, 'r')
-        img = resizeimage.resize_contain(img, size)
-        img = img.convert('RGB')
-
-        if np.array(img).shape == (256, 256, 3):
-            return self._save_image(img, image_path)
-        else:
-            return image_path
-
-    def _save_image(self, image, image_path, write_path=f'{str(ROOT_PATH)}/static/img/uploads'):
-        # save resized image with new name
-        new_image_path = f'{write_path}/RESIZED_{image_path.rsplit("/", 1)[-1]}'
-        LogManager.LogInfo(f'=> Save resized image {new_image_path}')
-        image.save(new_image_path)
-        # delete image
-        try:
-            LogManager.LogInfo(f'=> Delete old image {image_path}')
-            os.remove(image_path)
-        except OSError:
-            LogManager.LogInfo(f'=> Failed to delete {image_path}')
-
-        return new_image_path
 
     def _embed_image(self, image):
         geo_features = self._geo_embedding.get_img_embedding(image)
@@ -105,7 +76,7 @@ class MLMInference():
 
         return np.concatenate((geo_features, scene_features))
 
-    def _location_estimation(self, image_embedding, sample_id=None, k=10):
+    def _location_estimation(self, image_embedding, lang='en', sample_id=None, k=10):
         # get model results
         mlm_output = self._mlm_model.coord_net(self._mlm_model.learn_img(torch.from_numpy(image_embedding).unsqueeze(0)))
 
@@ -139,10 +110,12 @@ class MLMInference():
         for res in ranked_results:
             ir_results.append({
                 'id': f'Q{res[0]}',
-                'label': self._raw_data[str(res[0])]['label'],
-                'is_gold': True if res[0] == sample_id else False,
+                'label': self._raw_data[str(res[0])]['label'].replace('_', ' '),
                 'summary': self._raw_data[str(res[0])]['summaries'][lang] if lang in self._raw_data[str(res[0])]['summaries'] else list(self._raw_data[str(res[0])]['summaries'].values())[0]
             })
+
+            if sample_id is not None:
+                ir_results[-1]['is_gold'] = True if str(res[0]) == str(sample_id).lower().lstrip('q') else False
 
         return ir_results
 
@@ -155,11 +128,7 @@ class MLMInference():
 
         return rank_results[:k] # return top k ids and their scores
 
-    def predict(self, image_path, lang='en', tasks=['ir', 'le'], sample_id=None):
-        # read, resize and save image
-        if sample_id is None:
-            image_path = self._read_image(image_path)
-
+    def predict(self, image_path, tasks=['ir', 'le'], lang='en', sample_id=None):
         # get image embeddings
         image_embedding = self._embed_image(image_path)
 
@@ -167,6 +136,6 @@ class MLMInference():
         results = {}
         for task in tasks:
             if task in self._mlm_tasks:
-                results[task] = self._mlm_tasks[task](image_embedding, sample_id=sample_id)
+                results[task] = self._mlm_tasks[task](image_embedding, lang=lang, sample_id=sample_id)
 
         return results

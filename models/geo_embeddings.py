@@ -1,12 +1,15 @@
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import re
 import sys
 import logging
+logging.getLogger('tensorflow').disabled = True
 import numpy as np
 import tensorflow as tf
 from models import resnet_v2
 
 # TODO disable tensorflow logs
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 class GeoEmbeddings():
     def __init__(self, model_path='/checkpoints', cnn_input_size=224, use_cpu=True):
