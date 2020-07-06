@@ -1,30 +1,34 @@
 function showResults(results, map, markers) {
     // get results for each task
-    const resultsIR = results['results_ir']
-    const resultsLE = results['results_le']
+    const resultsIR = results['ir']
+    const resultsLE = results['le']
 
     // show coordinates
     markers.clearLayers();
-    resultsLE.forEach((result) => {
-        Object.keys(result).forEach((key) => {
-            // create the marker
-            var marker = L.marker(result[key]);
+    resultsLE.forEach((coord, idx) => {
+        // create the marker
+        var marker = L.marker(coord);
 
-            // label
-            marker.bindPopup(key).openPopup();
+        // label
+        const labelContent = `
+            <div>Rank: ${(idx+1).toString()}</div>
+            <div>${coord.join(', ')}</div>
+        `;
+        marker.bindPopup(labelContent).openPopup();
 
-            // add marker
-            markers.addLayer(marker);
-        })
+        // add marker
+        markers.addLayer(marker);
     })
     map.addLayer(markers);
+    map.fitBounds(markers.getBounds());
 
     // show results
     $('#results').empty();
     resultsIR.forEach((result, idx) => {
-        // Check if is gold
-        const borderClass = 'border-secondary' // ((result['is_gold']) ? 'border-success' : 'border-secondary');
-        // Construct card content
+        // check if is gold for border color
+        const borderClass = ((result['is_gold']) ? 'border-success' : 'border-secondary'); // 'border-secondary'
+
+        // create card content
         const cardContent = `
             <div class="card ${borderClass}" id="card-${idx}">
                 <div class="card-body">
@@ -37,7 +41,7 @@ function showResults(results, map, markers) {
             </div>
         `;
 
-        // Construct card expand modal
+        // create card expand modal
         const cardExapndModal = `
             <div class="modal fade" id="cardExpandModal-${idx}" tabindex="-1" role="dialog" aria-labelledby="cardExpandModalLabel-${idx}" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -51,7 +55,7 @@ function showResults(results, map, markers) {
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">
+                        <div class="modal-body" style="max-height: 500px; overflow-y:auto;">
                             <p class="card-text">${result['summary']}</p>
                         </div>
                     </div>
@@ -59,7 +63,31 @@ function showResults(results, map, markers) {
             </div>
         `;
 
-        // Construct card new-articles modal
+        // create content for new-articles modal
+        const cardnewsArticlesModalContent = []
+        const newsArticles = result['news_articles']
+
+        if (newsArticles.length > 0) {
+            newsArticles.forEach((article, article_idx) => {
+                cardnewsArticlesModalContent.push(`
+                    <div class="card" id="cardNewsModalContent-${article_idx}">
+                        <div class="card-body">
+                            <h4 class="card-title">${article['title']}</h4>
+                            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between;">
+                                <h6 class="card-subtitle mb-2 text-muted">Source: <a href="${article['source']}" target="_blank">${article['source']}</a></h6>
+                                <h6 class="card-subtitle mb-2 text-muted">Date: ${article['date']}</h6>
+                            </div>
+                            <p class="card-text cut-text">${article['body']}</p>
+                            <a href="${article['url']}" class="card-link" target="_blank">Read more</a>
+                        </div>
+                    </div>
+                `)
+            })
+        } else {
+            cardnewsArticlesModalContent.push(`<p>No news articles.</p>`)
+        }
+
+        // create new-articles modal
         const cardNewsModal = `
             <div class="modal fade" id="cardNewsModal-${idx}" tabindex="-1" role="dialog" aria-labelledby="cardNewsModalLabel-${idx}" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -73,8 +101,8 @@ function showResults(results, map, markers) {
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <div class="modal-body">
-                            <p>TODO</p>
+                        <div class="modal-body" style="max-height: 500px; overflow-y:auto;">
+                            ${cardnewsArticlesModalContent.join('')}
                         </div>
                     </div>
                 </div>
@@ -110,19 +138,32 @@ $(document).ready(function() {
         $(this).addClass('selected');
     });
 
+    $(document).ajaxSend(function() {
+		$("#overlay").fadeIn(300);　
+	});
+
     // submit image
     $('#submit_image').click(function(e) {
         e.preventDefault();
         $('#imageModal').modal('hide');
         var image_path = $('#imageSamples').find('.selected').attr('src');
-        $('#imageSamples').find('.selected').removeClass('selected');
-        var langImage = $('#imageLang').children("option:selected").val();
+        // $('#imageSamples').find('.selected').removeClass('selected');
+        var lang = $('#imageLang').children("option:selected").val();
+        var image_id = image_path.split('/').slice(-1)[0].split('_')[0];
         $.ajax({
-            type : "POST",
-            url : "/",
-            data: {query: image_path, lang: langImage},
+            type : 'POST',
+            url : '/mlm-demo/predict',
+            data: {'query': image_path, 'lang': lang, 'sample_id': image_id},
+            error: function(e) {
+                setTimeout(function(){$("#overlay").fadeOut(300);}, 500);
+                $('#ajaxAlertBody').empty();
+                $('#ajaxAlertBody').append(e.responseText);
+                $('#ajaxAlert').modal('show');
+                console.log(e);
+            },
             success: function(results) {
                 if (!jQuery.isEmptyObject(results)) { showResults(results, map, markers) }
+                setTimeout(function(){$("#overlay").fadeOut(300);}, 500);
             }
         });
     });
@@ -132,13 +173,26 @@ $(document).ready(function() {
         e.preventDefault();
         $('#uploadModal').modal('hide');
         // var uploadQuery = $('#query').val();
-        var langUpload = $('#uploadLang').children("option:selected").val();
+        var form_data = new FormData();
+        form_data.append('file', $('#uploadImage').prop('files')[0]);
+        form_data.append('lang', $('#uploadLang').children("option:selected").val());
         $.ajax({
-            type : "POST",
-            url : "/",
-            data: {query: '', lang: langUpload},
+            type : 'POST',
+            url : '/mlm-demo/predict',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            error: function(e) {
+                setTimeout(function(){$("#overlay").fadeOut(300);}, 500);
+                $('#ajaxAlertBody').empty();
+                $('#ajaxAlertBody').append(e.responseText);
+                $('#ajaxAlert').modal('show');
+                console.log(e);
+            },
             success: function(results) {
                 if (!jQuery.isEmptyObject(results)) { showResults(results, map, markers) }
+                setTimeout(function(){$("#overlay").fadeOut(300);}, 500);
             }
         });
     });
