@@ -11,17 +11,17 @@
           <!-- Upload content -->
           <div id="upload" class="tabcontent">
             <div class="form-group">
-              <input type="file" class="form-control-file" id="inputImage" aria-describedby="fileHelp">
+              <input type="file" class="form-control-file" id="uploadImage" aria-describedby="fileHelp">
               <small id="fileHelp" class="form-text text-muted">Allowed image extensions: png, jpg, jpeg</small>
             </div>
             <div id="uploadedImage"></div>
           </div>
         </div>
         <div class="modal-footer">
-          <select class="custom-select" id="imageLang" style="width: auto;">
-            <option value="en" selected>EN</option>
-            <option value="de">DE</option>
-            <option value="fr">FR</option>
+          <select class="custom-select" id="uploadLang" style="width: auto;">
+            {% for lang in languages %}
+              <option value="{{lang}}">{{lang.upper()}}</option>
+            {% endfor %}
           </select>
           <input id="submit_upload" class="btn btn-primary" type="submit" value="Retrieve Results">
         </div>

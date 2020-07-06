@@ -7,19 +7,17 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" id="imageSamples">
           <!-- Image content -->
-          <div id="imageSamples" class="tabcontent" style="display: block">
-              {% for data in sample_data %}
-                <img class="image-select" src="{{data['image']}}" />
-              {% endfor %}
-          </div>
+          {% for image in sample_images %}
+            <img class="image-select" src="{{image}}" />
+          {% endfor %}
         </div>
         <div class="modal-footer">
           <select class="custom-select" id="imageLang" style="width: auto;">
-            <option value="en" selected>EN</option>
-            <option value="de">DE</option>
-            <option value="fr">FR</option>
+            {% for lang in languages %}
+              <option value="{{lang}}">{{lang.upper()}}</option>
+            {% endfor %}
           </select>
           <input id="submit_image" class="btn btn-primary" type="submit" value="Retrieve Results">
         </div>
