@@ -33,4 +33,13 @@ python waitress_server.py
 This should run MLM-Geo in the following address [0.0.0.0:9000](0.0.0.0:9000).
 
 ## Live API
-A live API is provided alongside the application. More details on how to access it will come soon!
+A live API is provided alongside the application. It may be accessed in the following manner:
+```bash
+curl \
+-F 'file=@/path/to/image/image.jpg' \
+-F 'lang=en'  \
+http://cleopatra.ijs.si/mlm-demo/predict
+```
+Allowed image extensions: png, jpg, jpeg.
+
+Currently, we support the following languages: en, de, fr, it, es, pl, ro, nl, hu, pt.
