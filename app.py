@@ -49,8 +49,9 @@ def predict():
     results = mlm_inference.predict(query, tasks=tasks, lang=lang, sample_id=sample_id)
 
     # news articles
-    for res_ir in results['ir']:
-        res_ir['news_articles'] = news_articles.get_news_articles(res_ir['label'], lang)
+    if 'ir' in results:
+        for res_ir in results['ir']:
+            res_ir['news_articles'] = news_articles.get_news_articles(res_ir['label'], lang)
 
     # reset news articles api
     news_articles.reset()
@@ -60,5 +61,3 @@ def predict():
 
     return results
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9000)
