@@ -122,7 +122,7 @@ $(document).ready(function() {
     // page load
     $(window).on('load',function(){
         // show info modal
-        $('#infoModal').modal('show');
+        // $('#infoModal').modal('show');
 
         // create map
         // map and markers as global variables
