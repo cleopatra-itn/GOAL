@@ -1,1 +1,11 @@
+torchvision==0.6.1+cpu
+tensorflow_gpu==1.14.0
 Flask==1.1.2
+h5py==2.10.0
+python_resize_image==1.1.19
+eventregistry==8.7
+numpy==1.18.2
+torch==1.5.1+cpu
+Pillow==7.2.0
+scikit_learn==0.23.1
+tensorflow==2.2.0
