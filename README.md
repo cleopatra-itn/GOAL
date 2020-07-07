@@ -19,18 +19,21 @@ cd MLM_Geo
 pip install -r requirements.txt
 ```
 
-### Download Checkpoints and dataset files
+### Download checkpoints and dataset files
 For working with MLM-Geo locally you will need to download the model checkpoints and dataset files. Checkpoints should be placed under the models' directory in a folder named checkpoints. While all other files should be placed under a folder named data.
 
 Link for the checkpoints and dataset files will be provided soon!
 
+### EventRegistry API key
+To be able to retrieve the latest news for the entities, you will need to register on [EventRegistry](https://eventregistry.org/register) and use the API key. Please save the API key in a text file and name it ER_API_KEY.
+
 ### Run server
-We serve MLM-Geo using [Waitress](https://docs.pylonsproject.org/projects/waitress/en/latest/) pure-Python WSGI server. After having all the checkpoints and dataset files you can simply run:
+We serve MLM-Geo using [Waitress](https://docs.pylonsproject.org/projects/waitress/en/latest/) pure-Python WSGI server. After having the checkpoints, the dataset files and the EventRegistry API key you can simply run:
 ``` bash
 # run waitress server
 python waitress_server.py
 ```
-This should run MLM-Geo in the following address [0.0.0.0:9000](0.0.0.0:9000).
+This should run MLM-Geo in the following address [0.0.0.0:9000](http://0.0.0.0:9000/).
 
 ## Live API
 A live API is provided alongside the application. It may be accessed in the following manner:
