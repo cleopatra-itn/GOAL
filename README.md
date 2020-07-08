@@ -46,3 +46,6 @@ http://cleopatra.ijs.si/mlm-demo/predict
 Allowed image extensions: png, jpg, jpeg.
 
 Currently, we support the following languages: en, de, fr, it, es, pl, ro, nl, hu, pt.
+
+## License
+The repository is under [MIT License](LICENSE).
