@@ -6,7 +6,7 @@ MLM-Geo is built on top of the MLM dataset. In particular an extension of it wit
 
 MLM-Geo is currently online and you can give it a try [here](http://cleopatra.ijs.si/mlm-demo/)! More details on how to use it are present by clicking the info button on the page.
 
-## Run MLM-Geo locally:
+## Run MLM-Geo locally
 ### Requirements and Setup
 Python version >= 3.7
 
