@@ -14,8 +14,8 @@ PyTorch version = 1.5.1
 
 ``` bash
 # clone the repository
-git clone https://github.com/GOALCLEOPATRA/MLM_Geo.git
-cd MLM_Geo
+git clone https://github.com/cleopatra-itn/GOAL.git
+cd GOAL
 pip install -r requirements.txt
 ```
 
